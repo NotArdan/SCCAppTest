@@ -121,21 +121,13 @@ public class MainActivity extends AppCompatActivity {
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 //send image into google cloud platform using REST API endpoint thing
-
+                 //send image into google cloud platform using OkHTTP endpoint thing
                 try {
                     uploadObject();
                 } catch (IOException e) {
                     Log.e("UploadError", "Error uploading object", e);
                     Toast.makeText(MainActivity.this, "Error confirming " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
-
-
-                // input for testing results screen
-                //String OutPredict = "HealthySkin";
-                //Intent i = new Intent(MainActivity.this, Output.class);
-                //i.putExtra("OC", OutPredict);
-                //startActivity(i);
             }
         });
 
@@ -213,6 +205,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                     String responseBody = response.body().string();
                     runOnUiThread(() -> Toast.makeText(MainActivity.this, "Upload successful: " + responseBody, Toast.LENGTH_LONG).show());
+
+                    //go to results screen
+                    // input for testing results screen
+                    String OutPredict = "ChickenPox";
+                    Intent i = new Intent(MainActivity.this, Output.class);
+                    i.putExtra("OC", OutPredict);
+                    startActivity(i);
                 }
             });
 
@@ -221,20 +220,6 @@ public class MainActivity extends AppCompatActivity {
         } finally {
             imageStream.close();
         }
-    }
-
-
-
-
-
-
-    private String getRealPathFromURI(Uri contentUri) {
-        String[] proj = {MediaStore.Images.Media.DATA};
-        CursorLoader loader = new CursorLoader(getApplicationContext(), contentUri, proj, null, null, null);
-        Cursor cursor = loader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
