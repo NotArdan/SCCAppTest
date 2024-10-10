@@ -3,14 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FBFBEA"
     android:orientation="vertical">
 
     <ImageView
         android:id="@+id/OutputImage"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="250dp"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
+        android:scaleType="fitCenter"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
@@ -19,6 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginVertical="15dp"
+        android:fontFamily="@font/roboto"
         android:text="You have:"
         android:textAllCaps="false"
         android:textColor="@color/black"
@@ -30,25 +33,29 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginVertical="0dp"
+        android:fontFamily="@font/roboto"
         android:text="Output prediction"
         android:textAllCaps="true"
         android:textColor="@color/black"
-        android:textSize="25sp" />
+        android:textSize="25sp"
+        android:textStyle="bold" />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="250dp"
         android:layout_weight="1">
 
         <TextView
             android:id="@+id/OutputPredictionInfo"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="250dp"
             android:layout_marginVertical="0dp"
-            android:padding="16dp"
-            android:text="Info"
+            android:fontFamily="@font/roboto"
+            android:gravity=""
+            android:padding="18dp"
+            android:text=""
             android:textColor="@color/black"
-            android:textSize="15sp" />
+            android:textSize="18sp" />
     </ScrollView>
 
 </LinearLayout>

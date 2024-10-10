@@ -48,6 +48,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
 
+import org.json.JSONObject;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,9 +62,6 @@ public class MainActivity extends AppCompatActivity {
     OkHttpClient client;
     String getURL = "";
     String postURL = "";
-
-
-
 
 
     @Override
@@ -204,7 +203,11 @@ public class MainActivity extends AppCompatActivity {
                         throw new IOException("Unexpected code " + response);
                     }
                     String responseBody = response.body().string();
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Upload successful: " + responseBody, Toast.LENGTH_LONG).show());
+
+                    /////////////////////////////////// REMOVE COMMENT TO GET PREDICTIONS FROM JSON RESPONSE
+                    //JSONObject jsonResponse = new JSONObject(responseBody);
+                    //String OutPredict = jsonResponse.getString("Prediction");
+                    //runOnUiThread(() -> Toast.makeText(MainActivity.this, "Upload successful: " + responseBody, Toast.LENGTH_LONG).show());
 
                     //go to results screen
                     // input for testing results screen

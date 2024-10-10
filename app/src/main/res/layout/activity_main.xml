@@ -5,18 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#FBFBEA"
     tools:context=".MainActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Skin Conditions Classifier"
-        android:textSize="25sp"
-        android:layout_marginVertical="50dp"
         android:layout_gravity="center"
-        android:textColor="@color/black"
+        android:layout_marginVertical="50dp"
+        android:fontFamily="@font/roboto"
+        android:text="Skin Conditions Classifier"
         android:textAllCaps="true"
-        />
+        android:textColor="@color/black"
+        android:textSize="25sp" />
 
     <ImageView
         android:contentDescription=""
@@ -33,36 +34,38 @@
         tools:srcCompat="@tools:sample/avatars" />
 
 
-
     <Button
         android:id="@+id/btnPickImageGallery"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_width="200dp"
+        android:layout_height="70dp"
         android:layout_gravity="center"
-        android:text="Pick image from Gallery"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/roboto"
+        android:text="Upload image \nfrom Gallery"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <Button
         android:id="@+id/btnPickImageCamera"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_width="200dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="10dp"
         android:layout_gravity="center"
-        android:text="Capture Image using Camera"
+        android:fontFamily="@font/roboto"
+        android:text="Capture Image \nusing Camera"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <Button
         android:id="@+id/btnConfirmImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_width="200dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="10dp"
         android:layout_gravity="center"
-        android:text="Confirm and analyze chosen image"
+        android:fontFamily="@font/roboto"
+        android:text="Confirm and \nanalyze chosen image"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
