@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.myapplication"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -27,7 +27,7 @@ android {
         }
     }
 
-    packagingOptions {
+    packaging {
         resources.excludes.add("META-INF/INDEX.LIST")
         resources.excludes.add("META-INF/DEPENDENCIES")
         resources.excludes.add("META-INF/LICENSE")
@@ -37,6 +37,9 @@ android {
         resources.excludes.add("META-INF/NOTICE.txt")
         resources.excludes.add("META-INF/notice.txt")
         resources.excludes.add("META-INF/ASL2.0")
+        resources {
+            excludes += "META-INF/io.netty.versions.properties"
+        }
     }
 
     compileOptions {
@@ -46,7 +49,8 @@ android {
 }
 
 dependencies {
-
+    //implementation(platform("com.google.cloud:libraries-bom:26.49.0"))
+    //implementation("com.google.cloud:google-cloud-storage")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -56,4 +60,17 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation(platform("software.amazon.awssdk:bom:2.29.29"))
+    implementation("software.amazon.awssdk:auth:2.29.29")
+    implementation("software.amazon.awssdk:regions:2.29.29")
+    implementation("software.amazon.awssdk:s3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.0")
+    implementation("software.amazon.awssdk:core:2.29.29")
+    implementation("software.amazon.awssdk:apache-client:2.29.29")
+
+    //amazon andoird sdk
+    implementation("com.amazonaws:aws-android-sdk-core:2.77.1")
+    implementation("com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.77.1")
+    implementation("com.amazonaws:aws-android-sdk-s3:2.77.1")
+
 }

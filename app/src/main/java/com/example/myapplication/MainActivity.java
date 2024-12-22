@@ -17,38 +17,28 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.content.CursorLoader;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.exifinterface.media.ExifInterface;
 
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okio.BufferedSink;
 
-import org.json.JSONObject;
+
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+
+
+//aws android imports?
 
 
 public class MainActivity extends AppCompatActivity {
@@ -62,7 +52,10 @@ public class MainActivity extends AppCompatActivity {
     OkHttpClient client;
     String getURL = "";
     String postURL = "";
+    private S3Client s3Client;
+    String filePath;
 
+    //private AwsBasicCredentials creds = AwsBasicCredentials.create(Constants.ACCESS_ID, Constants.SECRET_KEY);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //if confirm button is clicked
+        //currently not working, previously working
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
 
     //open camera function
     private void openCamera() {
+        //create new intent for camera capture
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         //create instance of contentvalues to hold image from camera
         ContentValues value = new ContentValues();
         //title and description of image
@@ -141,88 +137,30 @@ public class MainActivity extends AppCompatActivity {
         value.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera");
         //get URI (location) of image
         selectedImageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, value);
-        //create new intent for camera capture
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
         //pass image and uri to pickCameraImage
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri);
         pickCameraImage.launch(cameraIntent);
     }
 
+
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private S3Uploader s3Uploader;
+
     private void uploadObject() throws IOException {
-        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Starting uploadObject method", Toast.LENGTH_LONG).show());
+        final String bucketName = "sccapp-testbucket";
+        final String key = "imageuploads/uploadedimage."+getFileExtension(selectedImageUri);
 
-        InputStream imageStream = getContentResolver().openInputStream(selectedImageUri);
-        if (imageStream == null) {
-            runOnUiThread(() -> Toast.makeText(MainActivity.this, "Image stream not found", Toast.LENGTH_LONG).show());
-            throw new FileNotFoundException("File not found: " + selectedImageUri.toString());
-        }
+        //call uploader class
+        s3Uploader = new S3Uploader(this);
 
-        // Read the image stream into a byte array
-        byte[] imageBytes = new byte[imageStream.available()];
-        imageStream.read(imageBytes);
+        //path to image file from gallery or cam
+        File file = new File(filePath);
+        s3Uploader.uploadFile(bucketName, key, file);
 
-        try {
-            runOnUiThread(() -> Toast.makeText(MainActivity.this, "Uploading to nodejs server", Toast.LENGTH_LONG).show());
-
-            OkHttpClient client = new OkHttpClient.Builder()
-                    .connectTimeout(30, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
-                    .build();
-
-            String fileExtension = getFileExtension(selectedImageUri);
-            String contentType = getContentTypeFromExtension(fileExtension);
-
-            // Create the request body
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("image", "testimage." + fileExtension,
-                            RequestBody.create(imageBytes, MediaType.parse(contentType)))
-                    .build();
-
-            // Build the request
-            Request request = new Request.Builder()
-                    .url("http://192.168.1.8:3000/predict") // REPLACE WITH SERVER URL
-                    .post(requestBody)
-                    .build();
-
-            runOnUiThread(() -> Toast.makeText(MainActivity.this, "Executing request...", Toast.LENGTH_LONG).show());
-
-            // Execute request asynchronously
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Upload failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
-                }
-
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    if (!response.isSuccessful()) {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Unexpected code: " + response.code(), Toast.LENGTH_LONG).show());
-                        throw new IOException("Unexpected code " + response);
-                    }
-                    String responseBody = response.body().string();
-
-                    /////////////////////////////////// REMOVE COMMENT TO GET PREDICTIONS FROM JSON RESPONSE
-                    //JSONObject jsonResponse = new JSONObject(responseBody);
-                    //String OutPredict = jsonResponse.getString("Prediction");
-                    //runOnUiThread(() -> Toast.makeText(MainActivity.this, "Upload successful: " + responseBody, Toast.LENGTH_LONG).show());
-
-                    //go to results screen
-                    // input for testing results screen
-                    String OutPredict = "ChickenPox";
-                    Intent i = new Intent(MainActivity.this, Output.class);
-                    i.putExtra("OC", OutPredict);
-                    startActivity(i);
-                }
-            });
-
-        } catch (Exception e) {
-            runOnUiThread(() -> Toast.makeText(MainActivity.this, "Upload failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
-        } finally {
-            imageStream.close();
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -328,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImageUri) throws IOException {
 
         //DO NOT EDIT IDK HOW THIS WORKS
-        String filePath = getRealPathFromUri(selectedImageUri); // Get the file path from the URI
+        filePath = getRealPathFromUri(selectedImageUri); // Get the file path from the URI
         ExifInterface ei = new ExifInterface(filePath);
         int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
 
@@ -417,7 +355,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else
                     runOnUiThread(() -> Toast.makeText(MainActivity.this, "Result null 1", Toast.LENGTH_LONG).show());
-
             });
 
 
