@@ -49,9 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap selectedImageBitmap;
     private ImageView selectedImage;
 
-    OkHttpClient client;
-    String getURL = "";
-    String postURL = "";
+
     private S3Client s3Client;
     String filePath;
 
@@ -61,15 +59,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // permission to use gallery and camera
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_DENIED) {
-                String[] permission = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                requestPermissions(permission, 112);
+            // permission to use gallery and camera
+            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
+                    checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 112);
             }
         }
+
 
         //link buttons into xml buttons
         Button galleryBtn = findViewById(R.id.btnPickImageGallery);
@@ -93,18 +90,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //check version of android
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    //check android permissions
-                    if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            == PackageManager.PERMISSION_DENIED) {
-                        String[] permission = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                        requestPermissions(permission, PERMISSION_CODE);
+                try {
+                    if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.M){
+                        if(checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
+                                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+                            String[] permission = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                            requestPermissions(permission,112);
+                        } else {
+                            openCamera();
+                        }
                     } else {
-                        //run if permissions ok
                         openCamera();
                     }
-                } else {
-                    openCamera();
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Error opening cam " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -128,8 +127,6 @@ public class MainActivity extends AppCompatActivity {
 
     //open camera function
     private void openCamera() {
-        //create new intent for camera capture
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         //create instance of contentvalues to hold image from camera
         ContentValues value = new ContentValues();
         //title and description of image
@@ -137,7 +134,8 @@ public class MainActivity extends AppCompatActivity {
         value.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera");
         //get URI (location) of image
         selectedImageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, value);
-
+        //create new intent for camera capture
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         //pass image and uri to pickCameraImage
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri);
         pickCameraImage.launch(cameraIntent);
