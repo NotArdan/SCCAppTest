@@ -73,4 +73,7 @@ dependencies {
     implementation("com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.77.1")
     implementation("com.amazonaws:aws-android-sdk-s3:2.77.1")
 
+    //amazon sqs
+    implementation("software.amazon.awssdk:sqs:2.29.29")
+
 }
