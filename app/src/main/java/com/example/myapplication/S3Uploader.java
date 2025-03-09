@@ -17,6 +17,8 @@ public class S3Uploader {
     private CognitoCachingCredentialsProvider credentialsProvider;
     private TransferUtility transferUtility;
     private Context context; // Save the context to use runOnUiThread
+    private CheckQueue checkQueue;
+    private long startTime, endTime, latency;
 
     public S3Uploader(Context context) {
         this.context = context;
@@ -36,7 +38,14 @@ public class S3Uploader {
                 .build();
     }
 
+    //for using credentials
+    public CognitoCachingCredentialsProvider getCredentialsProvider() {
+        return credentialsProvider;
+    }
+
     public void uploadFile(String bucketName, String key, File file) {
+        //start timer for latency testing
+        startTime = System.currentTimeMillis();
         // Start the upload
         TransferObserver observer = transferUtility.upload(bucketName, key, file);
 
@@ -48,6 +57,11 @@ public class S3Uploader {
                     if (state == TransferState.COMPLETED) {
                         Toast.makeText(context, "Upload completed!", Toast.LENGTH_SHORT).show();
                         Log.d("S3Uploader", "Upload completed.");
+                        //end timer for latency testing
+                        endTime = System.currentTimeMillis();
+                        latency = endTime - startTime; // Calculate latency in milliseconds
+                        Log.d("Latency", "Client-Server Latency upload image: " + latency + " ms");
+                        pollQueue();
                     } else if (state == TransferState.FAILED) {
                         Toast.makeText(context, "Upload failed!", Toast.LENGTH_SHORT).show();
                         Log.e("S3Uploader", "Upload failed.");
@@ -68,6 +82,12 @@ public class S3Uploader {
                 Log.e("S3Uploader", "Error during upload", ex);
             }
         });
+    }
+
+    private void pollQueue(){
+        //pass credentials to new checkqueue
+        checkQueue = new CheckQueue(this.context, getCredentialsProvider());
+
     }
 
     private void runOnUiThread(Runnable action) {

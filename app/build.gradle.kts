@@ -49,8 +49,7 @@ android {
 }
 
 dependencies {
-    //implementation(platform("com.google.cloud:libraries-bom:26.49.0"))
-    //implementation("com.google.cloud:google-cloud-storage")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -65,15 +64,19 @@ dependencies {
     implementation("software.amazon.awssdk:regions:2.29.29")
     implementation("software.amazon.awssdk:s3")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.0")
-    implementation("software.amazon.awssdk:core:2.29.29")
-    implementation("software.amazon.awssdk:apache-client:2.29.29")
 
-    //amazon andoird sdk
+
+    //amazon android sdk
     implementation("com.amazonaws:aws-android-sdk-core:2.77.1")
     implementation("com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.77.1")
     implementation("com.amazonaws:aws-android-sdk-s3:2.77.1")
 
     //amazon sqs
-    implementation("software.amazon.awssdk:sqs:2.29.29")
+    implementation("com.amazonaws:aws-android-sdk-sqs:2.77.1")
+
+    //camerax
+    implementation("androidx.camera:camera-core:1.4.1")
+    implementation("androidx.camera:camera-camera2:1.4.1")
+    implementation("androidx.camera:camera-lifecycle:1.4.1")
 
 }

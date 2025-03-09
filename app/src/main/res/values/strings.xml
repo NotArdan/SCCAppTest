@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">SCC App</string>
+    <string name="test_placeholder">TERMS AND CONDITIONS\n
+
+    </string>
+    <string name="body">• The SCC App (Skin Condition Classifier App) is an application that allows users to upload images for skin condition classification using AI model.
+        The SCC App only serves as a Prototype application meant for the group\'s fulfillment of undergraduate thesis and is expected to
+        not have any updates in the future.\n\n
+    • The application only requires one image to be uploaded to the cloud for the AI model to classify the skin condition. It will be temporarily stored in our AWS platform.
+        For more information regarding their services, please refer to the AWS Privacy Policy.\n\n
+
+        • Any images that are used for model inference are not stored in any database nor will be used for any succeeding trainings.\n\n
+        • Even if the application has been verified with doctors and dermatologists, this application is not meant to be used to substitute and/or replace actual doctors;
+        It is still highly advised to see an actual doctor regardless of the result from this application to ensure proper identification of your skin condition.\n\n
+        • By clicking the button below, the user has read the terms and condition and acknowledges the statements above.
+    </string>
+    <string name="testinfo">"• You have healthy skin. It appears smooth, hydrated, and undamaged. The skin is the outer protective" +
+                        "layer of the body, and it is good to keep healthy.\n" +
+                        "To keep your skin healthy, you can do the following:\n" +
+                        "• Apply moisturizer at least once a day\n" +
+                        "• Avoid damage from UV, apply sunscreen if necessary and wear protective clothing\n" +
+                        "• Avoid taking hot showers to prevent skin from drying\n" +
+                        "• Stay hydrated to maintain moisture in the skin"));
+</string>
 </resources>

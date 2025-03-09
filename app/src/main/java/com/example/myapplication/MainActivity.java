@@ -19,8 +19,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.exifinterface.media.ExifInterface;
 
@@ -59,12 +61,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // permission to use gallery and camera
-            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
+        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
                     checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 112);
-            }
+            String[] permission = {"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
+            requestPermissions(permission, 112);
         }
 
 
@@ -72,6 +73,16 @@ public class MainActivity extends AppCompatActivity {
         Button galleryBtn = findViewById(R.id.btnPickImageGallery);
         Button cameraBtn = findViewById(R.id.btnPickImageCamera);
         Button confirmBtn = findViewById(R.id.btnConfirmImage);
+        Button disclaimerBtn = findViewById(R.id.btnDisclaimer);
+
+        //if terms condition button is clicked
+        disclaimerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent dislaimerIntent = new Intent(MainActivity.this, Disclaimer.class);
+                startActivity(dislaimerIntent);
+            }
+        });
 
         //if gallery button is clicked
         galleryBtn.setOnClickListener(new View.OnClickListener() {
@@ -90,20 +101,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //check version of android
-                try {
-                    if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.M){
-                        if(checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
-                                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
-                            String[] permission = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                            requestPermissions(permission,112);
-                        } else {
-                            openCamera();
-                        }
-                    } else {
-                        openCamera();
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "Error opening cam " + e.getMessage(), Toast.LENGTH_LONG).show();
+                if(checkSelfPermission("android.permission.CAMERA") == PackageManager.PERMISSION_GRANTED && checkSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE") == PackageManager.PERMISSION_GRANTED){
+                    openCamera();
+                } else {
+                    String[] permission2 = {"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
+                    requestPermissions(permission2, 1000);
+                    openCamera();
                 }
             }
         });
@@ -125,20 +128,28 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
     //open camera function
     private void openCamera() {
-        //create instance of contentvalues to hold image from camera
-        ContentValues value = new ContentValues();
-        //title and description of image
-        value.put(MediaStore.Images.Media.TITLE, "New Picture");
-        value.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera");
-        //get URI (location) of image
-        selectedImageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, value);
-        //create new intent for camera capture
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //pass image and uri to pickCameraImage
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri);
-        pickCameraImage.launch(cameraIntent);
+        try{
+            ContentValues value = new ContentValues();
+            //title and description of image
+            value.put(MediaStore.Images.Media.TITLE, "New Picture");
+            value.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera");
+            //get URI (location) of image
+            selectedImageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, value);
+            //create new intent for camera capture
+            Log.d("CameraDebug", "Image URI: "+selectedImageUri.toString());
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            //pass image and uri to pickCameraImage
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri);
+            pickCameraImage.launch(cameraIntent);
+        }catch (Exception e){
+            Log.e("CameraError", "Error opening camera "+e.getMessage());
+            Toast.makeText(this, "Error opening camera "+e.getMessage(),Toast.LENGTH_LONG).show();
+        }
+
     }
 
 
@@ -158,8 +169,8 @@ public class MainActivity extends AppCompatActivity {
         //path to image file from gallery or cam
         File file = new File(filePath);
         s3Uploader.uploadFile(bucketName, key, file);
-
     }
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
