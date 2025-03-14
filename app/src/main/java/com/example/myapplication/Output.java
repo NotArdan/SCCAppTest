@@ -140,7 +140,7 @@ public class Output extends AppCompatActivity {
                         "• In severe cases where the affected individual has trouble breathing, consider going to the ER for doctor consultation."));
 
         conditionText.put("TPedis", new predictionsHandler.predictionInfo("Athlete's Foot",
-                "tinepedisImg.jpg",
+                "tineapedisImg.jpg",
                 "More information about Athlete's Foot:\n\n" +
                         "• Athlete's foot is a common fungal infection that affects the skin on the feet, particularly between" +
                         "the toes. Symptoms are itching, burning or stinging, red, scaly, or peeling skin, cracking, blisters in some cases," +
